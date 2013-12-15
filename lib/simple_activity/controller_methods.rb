@@ -2,78 +2,52 @@ module SimpleActivity
 
   # Public: To be used on controller. The module is supposed to be
   # included in ActionController::Base
+
   module ControllerMethods
 
-    @@simple_activity_callbacks = []
+    def self.included(base)
+      base.after_filter :record_activity, only: [:create, :update, :destroy]
+    end
 
-    # Public: Record this activity to db, based on current_user,
-    # the model, and the action(default to controller's action)
+    # The main method to log activity.
     #
-    # obj     - The instance after success in controller
-    # options - Possible options to customize the activity output.
-    #           :action_key - default to this action_name in controller,
-    #                         but it can be manually assigned in the
-    #                         option.
+    # By default it is used as an after_filter
     #
-    # Examples
+    # If after_filter disabled, it can be called without arguments
     #
+    #   # ArticlesController
     #   def create
-    #     @article = Article.new(params[:article])
+    #     @article = Article.create(params[:article])
     #     if @article.save
-    #       simple_activity_log @article
-    #       redirect_to article_path(@article)
-    #     else
-    #       respond_with @article
+    #       record_activity
     #     end
     #   end
     #
-    def simple_activity_log(target, options={})
-      activity = log_activity target, options
-      simple_activity_run_callbacks(activity)
-    end
-
-    # Public: To add callback methods after activity log created.
-    # Recommend to use it as before_filter, or when the third party module
-    # loaded.
-    # Must be set before calling simple_activity_log
+    # target argument is needed if the instance is not the convention
+    # (the sigularize of controller name)
     #
-    # method - The method name in symbol. e.g. :foo
-    def run_after_simple_activity_created(method)
-      @@simple_activity_callbacks.push method
-    end
-
-
-    # Public: Record activity to db. For arguments see the public
-    # method
+    #   # ArticlesController
+    #   def create
+    #     @article_in_other_name = Article.create(params[:article])
+    #     if @article_in_other_name.save
+    #       record_activity(@article_in_other_name)
+    #     end
+    #   end
     #
-    # Returns activity object
-    def log_activity(obj, options={})
-      action_key = options[:action_key] || action_name
-      ActivityPoints::Activity.create(
-        trackable_type: 'user',
-        trackable_id: current_user.try(:id),
-        target_type: obj.class.to_s,
-        target_id: obj.id,
-        action_key: action_key,
-        options: options
-      )
+    #
+    # @param target [Object] the target instance variable. If nil, the processor
+    #        will build it according to mathcing instance variable in controller
+    #        automatically
+    def record_activity(target=nil)
+      activity = ::SimpleActivity::ActivityProcessor.new(self, target)
+      activity.save
     end
 
-    private
-
-    # Interal: Run callbacks added in 
-    def simple_activity_run_callbacks(activity)
-      if @@simple_activity_callbacks.present?
-        @@simple_activity_callbacks.each do |method|
-          send(method, activity) if self.respond_to? method
-        end
-      end
-    end
   end
 end
 
 if defined? ActionController::Base
   ActionController::Base.class_eval do
-    include ActivityPoints::ControllerMethods
+    include SimpleActivity::ControllerMethods
   end
 end

@@ -1,46 +1,64 @@
-class SimpleActivity::Activity < ActiveRecord::Base
-  belongs_to :actable, polymorphic: true
-  
-  attr_accessible :actable_type, :actable_id, :target_type, :target_id, :action, :reference
+module SimpleActivity
+  class Activity < ActiveRecord::Base
+    self.table_name = "simple_activity_activities"
 
-  # Public: Map actions into past form. The action names come from
-  # controller.
-  # The mapping should also define preposition if needed   
-  #
-  # @wait! - How about the passive actions? Say an author of comment
-  # got points because other voted his comment? Should it be "be voted"
-  #
-  # Answer: It's not needed in activities, but required in showing points in
-  # Point model. Activities are all active, no passive.
-  PAST_FORM = {
-    create:  'created',
-    update:  'updated',
-    destroy: 'deleted',
-    comment: 'commented on',
-    vote:    'voted on'
-  }
+    # cache can cache rule when necessary, for third party lib speeding
+    # us processing.
+    if Rails::VERSION::MAJOR == 3
+      attr_accessible :actor_type, :actor_id, :target_type, :target_id, :action_key, :display, :cache
+    end
 
-  # Public: format to show activity in view. This method is
-  # expected to override according to use case.
-  #
-  # To override, you can do it either in model(no helpers), 
-  # presenter/decorator(having access to url helpers and other helpers)
-  # or a helper. Or call the attributes directly in a partial.
-  def show_activity
-    "#{actor} #{past_form(action_key)} #{trackable_type} with id #{trackable_id}"
-  end
+    serialize :cache
 
-  private
+    # Show activities belongs to an actor
+    def self.actor_activities(obj)
+      type = obj.class.to_s
+      id   = obj.id
+      self.where(actor_type: type, actor_id: id)
+    end
 
-  def past_form(action_key)
-    if action_in_past = PAST_FORM[action_key.to_sym]
-      action_in_past
-    else
-      if action_key.last == "e"
-        "#{action_key}d"
+    # Show activities belongs to a target
+    def self.target_activities(obj)
+      type = obj.class.to_s
+      id   = obj.id
+      self.where(target_type: type, target_id: id)
+    end
+
+    # Delegate the methods start with "actor_" or "target_" to
+    # cached result
+    def method_missing(method_name, *arguments, &block)
+      if method_name.to_s =~ /(actor|target)_.*/
+        self.cache[method_name.to_s]
       else
-        "#{action_key}ed"
+        super
       end
+    end
+
+    def respond_to_missing?(method_name, include_private = false)
+      method_name.to_s.match /(actor|target)_.*/ || super
+    end
+
+    def actor
+      actor_type.capitalize.constantize.find(actor_id)
+    end
+
+    def target
+      target_type.capitalize.constantize.find(target_id)
+    end
+
+    def can_display?
+      display
+    end
+
+    private
+
+    def self.cache_methods
+      Rule.get_rules_set self.class.to_s
+    end
+
+    def past_form(action)
+      action.last == 'e' ?
+        "#{action}d" : "#{action}ed"
     end
   end
 end

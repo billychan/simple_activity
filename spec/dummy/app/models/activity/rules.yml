@@ -1,0 +1,29 @@
+# Sample Activity settings
+
+Comment:
+  create:
+    verb: commented on
+    points:
+      - user: 10
+        condition: within_1_day_of_article
+      - commentable_user: 2
+  update:
+    verb: revised
+  destory:
+    verb: deleted
+    points:
+      - user: -10
+      - commentable_user: -2
+  _cache: 
+    actor:
+      - name
+    target:
+      - body
+Article:
+  create:
+    verb: posted
+  _cache:
+    actor:
+      - name
+    target:
+      - title
