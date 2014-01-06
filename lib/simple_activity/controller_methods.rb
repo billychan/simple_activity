@@ -5,6 +5,12 @@ module SimpleActivity
 
   module ControllerMethods
 
+    # extend ActiveSupport::Concern
+
+    # included do
+    #   after_filter :record_activity, only: [:create, :update, :destroy]
+    # end
+    #
     def self.included(base)
       base.after_filter :record_activity, only: [:create, :update, :destroy]
     end
@@ -46,8 +52,11 @@ module SimpleActivity
   end
 end
 
-if defined? ActionController::Base
-  ActionController::Base.class_eval do
-    include SimpleActivity::ControllerMethods
-  end
-end
+# ActiveSupport.on_load(:action_controller) do
+#   ActionController::Base.send :include, SimpleActivity::ControllerMethods
+# end
+# ActionController::Base.send :include, SimpleActivity::ControllerMethods
+# ActionController::Base.class_eval do
+#   include SimpleActivity::ControllerMethods
+# end
+# end

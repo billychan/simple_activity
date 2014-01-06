@@ -1,19 +1,31 @@
+require 'active_support/concern'
+
 module SimpleActivity
   module ModelExtenders
-    def acts_as_activity_actor
-      define_method(:activities) do
-        ::SimpleActivity::Activity.actor_activities(self)
+    extend ActiveSupport::Concern
+
+    module ClassMethods
+      def acts_as_activity_actor
+        include ::SimpleActivity::ActorMethods
+      end
+
+      def acts_as_activity_target
+        include ::SimpleActivity::TargetMethods
       end
     end
+  end
 
-    def acts_as_activity_target
-      define_method(:activities) do
-        ::SimpleActivity::Activity.target_activities(self)
-      end
+  module ActorMethods
+    def activities
+      ::Activity.actor_activities(self)
+    end
+  end
+
+  module TargetMethods
+    def activities
+      ::Activity.target_activities(self)
     end
   end
 end
 
-if defined?(ActiveRecord::Base)
-  ActiveRecord::Base.extend SimpleActivity::ModelExtenders
-end
+ActiveRecord::Base.send :include, SimpleActivity::ModelExtenders

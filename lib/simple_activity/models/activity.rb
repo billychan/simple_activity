@@ -10,6 +10,18 @@ module SimpleActivity
 
     serialize :cache
 
+
+    # def self.build_cache_methods
+    #   rules = Rule.get_rules_set(self.class_name)
+    #   rules.each do |rule|
+    #     define_method :rule do
+    #       cache[rule.to_s]
+    #     end
+    #   end
+    # end
+
+    # build_cache_methods
+
     # Show activities belongs to an actor
     def self.actor_activities(obj)
       type = obj.class.to_s
@@ -24,11 +36,15 @@ module SimpleActivity
       self.where(target_type: type, target_id: id)
     end
 
+    def cache
+      read_attribute(:cache) || []
+    end
+
     # Delegate the methods start with "actor_" or "target_" to
     # cached result
     def method_missing(method_name, *arguments, &block)
-      if method_name.to_s =~ /(actor|target)_.*/
-        self.cache[method_name.to_s]
+      if method_name.to_s =~ /(actor|target)_(?!type|id).*/
+        self.cache.try(:[], method_name.to_s)
       else
         super
       end
@@ -36,6 +52,17 @@ module SimpleActivity
 
     def respond_to_missing?(method_name, include_private = false)
       method_name.to_s.match /(actor|target)_.*/ || super
+    end
+
+    # TODO: Untested
+    def update_cache(cache_rule)
+      cache_rule.each do |type, type_methods|
+        type_methods.each do |method|
+          value = self.send(type).send(method)
+          self.cache["#{type}_#{method}"] = value
+        end
+      end
+      save
     end
 
     def actor
