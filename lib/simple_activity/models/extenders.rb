@@ -27,5 +27,3 @@ module SimpleActivity
     end
   end
 end
-
-ActiveRecord::Base.send :include, SimpleActivity::ModelExtenders
