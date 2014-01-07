@@ -6,7 +6,6 @@ describe SimpleActivity::ControllerMethods do
   let(:controller) { controller_class.new }
 
   context "add after_filter" do
-
     it "add after_filter once included" do
       options = {only: [:create, :update, :destroy]}
       expect(controller_class).to receive(:after_filter)
@@ -15,22 +14,17 @@ describe SimpleActivity::ControllerMethods do
     end
   end
 
-  context "methods" do
+  context "#record_activity" do
     before do
-      controller_class.stub(:after_filter)
+      allow(controller_class).to receive(:after_filter)
       controller_class.send(:include, SimpleActivity::ControllerMethods)
     end
-
-    context "#record_activity" do
-
-      it "sends a request to create a new activity" do
-        foo = Object.new
-        SimpleActivity::ActivityProcessor.stub(:new).and_return(foo)
-        expect(foo).to receive(:save)
-        controller.record_activity
-      end
-
+    it "sends a request to create a new activity" do
+      foo = Object.new
+      allow(SimpleActivity::ActivityProcessor).to receive(:new).and_return(foo)
+      allow(controller).to receive(:controller_name).and_return('foo')
+      expect(foo).to receive(:save)
+      controller.send :record_activity
     end
-
   end
 end

@@ -3,7 +3,7 @@ require "spec_helper"
 module SimpleActivity
   describe Activity do
 
-    context "Use cache to find methods about actor and target" do
+    context "Dynamic methods on actor and target delegates to cache attr" do
       let(:activity){Activity.new}
 
       it "respond to methods start with actor_" do
@@ -20,7 +20,15 @@ module SimpleActivity
         )
         expect(activity.actor_foo).to eq('bar')
       end
-    end
 
+      context "will not call cache for existing method" do
+        %w{actor_type actor_id target_type target_id}.each do |method|
+          it "calls #{method} directly" do
+            expect(activity).not_to receive(:cache)
+            activity.send method
+          end
+        end
+      end
+    end
   end
 end

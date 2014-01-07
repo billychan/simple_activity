@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'rails', '>= 3.2.0', '< 5.0'
 
   s.add_development_dependency "sqlite3"
-  s.add_development_dependency "rspec-rails"
+  s.add_development_dependency "rspec-rails", "3.0.0.beta1"
   s.add_development_dependency "database_cleaner", "~> 0.9.1"
   s.add_development_dependency 'pry-rails'
   s.add_development_dependency 'pry-highlight'

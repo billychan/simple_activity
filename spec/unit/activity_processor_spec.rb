@@ -11,9 +11,8 @@ module SimpleActivity
                                    action_name: 'update', 
                                    current_user: @user)  
       @article    = ::Article.create(title: 'foo')
-      @controller.stub(:instance_variable_get).with("@article")
+      allow(@controller).to receive(:instance_variable_get).with("@article")
       .and_return(@article)
-      @logger = @controller.stub(:logger)
     end
 
     context "Create valid activity" do

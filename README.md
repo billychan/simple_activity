@@ -1,42 +1,53 @@
 # SimpleActivity
 
-SimpleActivity is a gem for Rails to efficiently record, display and reuse users activities.
+SimpleActivity is a gem to record, display and reuse users activities for
+Rails app, in a fast, flexible and extendable way.
 
-##Features
-* Record key data of user activities(create, update, destroy and custom), in controler level.
-* Cache machanism for displaying activities efficiently with minimal database load.
-* Centralized yml configuration. Easy to read and manage. 
-* Open possibility for futher working on the activities either by backend worker or per request,
-with either a gem or code in app. For example, assign reputation to model/users based on activity.
+## Features
+* Fast. SimpleActivity is built with speed in mind. Normally activities involve
+several models and hard to eager load. SimpleActivity allows you define cache
+rules beforehand so there is no JOIN on displaying activities. 
+* Flexible. Raw data is here, you are free to do anything you like, display them
+in any fashion.
+* Extendable. Actually activity records are very useful not only for displaying a timeline.
+There could be lots of other functionality based on activity such as assining reputation
+to models, assign points to users, send notifications etc. It would be redudant if
+every feature build its own logic to record activity which is basically the same.
 
-## Background
-I have worked on a project with light social functionality. We used several nice gems
-to handle activities, reputations, user points etc. They are all great solution but
-I found we are repeating the work of logging activities and analyzing it again and again.
-So I thought, could we just have one representative to record activity and have others
-just working on the raw data?
+    To solve this problem, SimpleActivity provides a hook for other libs or your app code to work
+on the raw data once activity created, either within the request or at
+backend(recommended). This will remove code repetition and increase app performance.
+
+## How it works
+* Record key data of user activities(create, update, destroy and custom) in
+controler level, automaticly or manually.
+* Read and process cache rules to allow showing activities with minimal db load.
+* Provide helper to load partials with defined names
+* Provide barebone model to allow your customization if needed.
+* Provide hook to further working on the activity created.
+
+## Compatability
+
+SimpleActivity is built to work under both Rails 3 and Rails 4. The demo is on Rails 4.
+The current tests are based on Rails 3, and Rails 4 ones will come later.
+
+The current ORM is ActiveRecord. Other ORMS should be able to added in the future without
+too much sweat(or coffee?)
 
 ## Installation
 
-Add this line to your application's Gemfile:
+1. Add the gem to Gemfile and `bundle`
 
     gem 'simple_activity'
 
-And then execute:
+2. Install it.  
 
-    $ bundle
+    $ rails generate simple_activity:install
+    $ rake db:migrate
 
-And then install SimpleActivity
-
-    $ rails generate simple_activity
+    This will copy the migration file, rule file and barebone model Activity.
 
 ## Usage
-
-SimpleActivity works on controller level and locks three most important elements:
-The actor(normally current_user), the target(model), and the exact controller action.
-All others are optional.
-
-To create 
 
 ### Record Activities
 By default you don't need to do anything to get activities recorded.
@@ -45,12 +56,15 @@ Activity record will be created automaticly at basic RESTful actions :create, :u
 and :destroy, with filtering out some controllers such as "registration", "session",
 "admin" etc.
 
-You can also customize the initializer to
-* Add or remove actions to record
-* Filtering out more or less controllers
-* Disable automatic after_filter and
-  * Add after_filter by yourself in controllers
-  * Don't use after_filter but call the method manually
+To customize the actions to record
+  TODO
+
+To filter out more controllers
+  TODO
+
+To disable automatic after_filter and do it by yourself
+  TODO
+
 
 ### Display Activities: Define Rules
 
@@ -60,10 +74,6 @@ rule.yml is to helper displaying - customizing displaying logic and define thing
 Here is an example of rules.yml
 ```yml
 Comment:
-  create:
-    verb: 'commented on'
-  destroy:
-    verb: 'deleted'
   _cache:
     actor:
       - nick_name
@@ -74,47 +84,39 @@ Article:
   ...
 ```
 
-The top level item is 
+### Display Activities: By partial
 
-### Display Activities
+A helper `render_activity(activity)` is shipped. This helper will render partial
+at default place according to the activity. 
 
-## Use SimpleActivity for extending
+At first you need to write partials at right place. By default the helper will
+look up `app/views/activities` folder. The partial name need to be a combination
+of model name and action key with underscore before. e.g. `_comment_create.html.erb`,
+`_article_destroy.html.slim`
 
-To add actions after activity creation. TODO
+You can call any attributes defined in cache rules within the partial, by concating
+actor/target and the method name. e.g. `activity.actore_name`, `activity.target_title`, 
+`activity.target_commentable_title`
 
-    # Controller macro
-    if defined? SimpleActivity
-      run_after_activity_created :my_gem_method
-    end
+`actor_id` and `target_id` is available natively. No need cache rules.
 
-    # The my_gem_method SHOULD be defined to receive activity
-    # as argument
-    def my_gem_method(activity); end
+Also `actor` and `target` object is available if you really need them. But it's not
+recommended to use them to reduce db load. `activity.actor.name` is less preferred to
+`activity.actore_name` which is a cached value.
 
-## Display activities
-Cache is important for displaying logic, and only for that.
+As said above, to define a link, you don't need the instance itself. Instead, id will work
+as well. So, instead of `link_to activity.actor`, it's recommended to use
+`link_to user_path(activity.actor_id)`
 
-Queries for activities would normally be very heavy. Let's use the example of Github. Joe
-starred repo 'foo', so the repo name should be queried and shown. Bob commented on an issue,
-and the comment excerpt should be queried. These activities are not consistent in model, so
-it's hard to eager loading them within one query. Instead, each activity
-need to get its own attributes by an extra query.
+## Extend SimpleActivity - Reuse activity in third party libs
 
-The 'cache' attribute of activity solve this problem by storing these required attributes
-in db when creating the activity. So, when querying activities, only activities table will be
-involved.
-
-## Futher working on the activities
-There are lots of functionalities based on user's activities. Beyond showing
-the activities like a timeline, we may also need to assign points to users,
-assign reputations to models, assign badges to users, analyze behaviours etc.
-
-They all need raw activities to judge and act. Instead that each of those functionality
-build its own activity records, SimpleActivity aims for providing such raw data
-in a bit more consistent way, and open a possibility to let other libs hook their
-actions after activity record created, either within request or by backend jobs(to do later)
+Funtionality shipped. Docs coming later.
 
 ## Contributing
+
+This gem is still at its early stage. Very likely there are bugs and unconsidered 
+situations. Thansk for your patience and trust to use it. Your bug reporting and
+pull requests will be much appreciated.
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)

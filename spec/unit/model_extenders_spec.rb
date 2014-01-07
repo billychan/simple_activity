@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'active_support/concern'
 
 module SimpleActivity
   describe ModelExtenders do
@@ -6,9 +7,10 @@ module SimpleActivity
       before do
         stub_const 'ActorFoo',  Class.new
         stub_const 'TargetFoo', Class.new
-        stub_const 'Activity',  Class.new
-        ActorFoo.extend ModelExtenders
-        TargetFoo.extend ModelExtenders
+        stub_const 'Activity',  Class.new(SimpleActivity::Activity)
+        [ActorFoo, TargetFoo].each do |model|
+          model.send :include, ModelExtenders
+        end
         ActorFoo.class_eval do
           acts_as_activity_actor
         end

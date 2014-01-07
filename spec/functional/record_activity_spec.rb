@@ -7,18 +7,14 @@ describe "Record activity by automatic after_filter", type: :controller do
 
     def create
       @article = Article.new(params[:article])
-      if @article.save
-        render text: 'saved'
-      else
-        render text: 'error'
-      end
+      @article.save ? render(text: 'saved') : render(text: 'error')
     end
   end
 
   before do
     @user = User.create(name: 'Bob')
-    @controller.stub(:current_user).and_return(@user)
-    @controller.stub(:controller_name).and_return('articles')
+    allow(@controller).to receive(:current_user).and_return(@user)
+    allow(@controller).to receive(:controller_name).and_return('articles')
   end
 
   context "create activity" do

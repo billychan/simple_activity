@@ -12,7 +12,7 @@ module SimpleActivity
     # end
     #
     def self.included(base)
-      base.after_filter :record_activity, only: [:create, :update, :destroy]
+      base.after_filter :record_activity, only: SimpleActivity.allowed_actions
     end
 
     # The main method to log activity.
@@ -44,7 +44,14 @@ module SimpleActivity
     # @param target [Object] the target instance variable. If nil, the processor
     #        will build it according to mathcing instance variable in controller
     #        automatically
+    private
     def record_activity(target=nil)
+      unless controller_name.match SimpleActivity.filtered_controllers
+        process_activity(target)
+      end
+    end
+
+    def process_activity(target)
       activity = ::SimpleActivity::ActivityProcessor.new(self, target)
       activity.save
     end

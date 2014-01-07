@@ -10,18 +10,6 @@ module SimpleActivity
 
     serialize :cache
 
-
-    # def self.build_cache_methods
-    #   rules = Rule.get_rules_set(self.class_name)
-    #   rules.each do |rule|
-    #     define_method :rule do
-    #       cache[rule.to_s]
-    #     end
-    #   end
-    # end
-
-    # build_cache_methods
-
     # Show activities belongs to an actor
     def self.actor_activities(obj)
       type = obj.class.to_s
