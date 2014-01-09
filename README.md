@@ -4,17 +4,18 @@ SimpleActivity is a gem to record, display and reuse users activities for
 Rails app, in a fast, flexible and extendable way.
 
 ## Features
-* Fast. SimpleActivity is built with speed in mind. Normally activities involve
+* **Fast** - SimpleActivity is built with speed in mind. Normally activities involve
 several models and hard to eager load. SimpleActivity allows you define cache
 rules beforehand so there is no JOIN on displaying activities. 
-* Flexible. Raw data is here, you are free to do anything you like, display them
+
+* **Flexible** - Raw data is here, you are free to do anything you like, display them
 in any fashion.
-* Extendable. Actually activity records are useful not only for displaying as timeline.
-There could be lots of other functionality based on activity such as assining reputation
+
+* **Extendable** - Actually activity records are useful not only for displaying as timeline. There could be lots of other functionality based on activity such as assining reputation
 to models, assign points to users, send notifications, granting badges etc. It would be
 redudant if every feature build its own logic to record activity which is basically the same.
 
-    To solve this problem, SimpleActivity provides a hook for other libs or your app code to work
+    To solve this problem, this gem provides a hook for other libs or your app code to work
 on the raw data once activity created, either within the request or at
 backend(recommended). This will remove code repetition and increase app performance.
 
@@ -26,26 +27,20 @@ controler level, automaticly or manually.
 * Provide barebone model to allow your customization if needed.
 * Provide hook to further working on the activity created.
 
-## Compatability
-
-SimpleActivity is built to work under both Rails 3 and Rails 4. The demo is on Rails 4.
-The current tests are based on Rails 3, and Rails 4 ones will come later.
-
-The current ORM is ActiveRecord. Other ORMS should be able to added in the future without
-too much sweat(or coffee?)
-
 ## Installation
 
-1. Add the gem to Gemfile and `bundle`
+* Add the gem to Gemfile and `bundle`
 
+```bash
     gem 'simple_activity'
+```
 
-2. Install it.  
+* Install the custom files and migration  
 
+```bash
     $ rails generate simple_activity:install
     $ rake db:migrate
-
-    This will copy the migration file, rule file and barebone model Activity.
+```
 
 ## Usage
 
@@ -100,7 +95,7 @@ as well. So, instead of `link_to activity.actor`, it's recommended to use
 
 ## Configurations
 
-+To customize the actions to record+
+#### To customize the actions to record
 
 The default actions to record activiies are `:create`, `:update` and `:destroy`.
 Customize them as per your need.
@@ -108,7 +103,7 @@ Customize them as per your need.
 config.filtered_controllers = /(user|admin|session|registration)/i
 ```
 
-+To filter out more controllers+ 
+#### To filter out more controllers
 
 You don't need activity to be recorded in every controller. Below is the
 default settings. You can customize them as you like.
@@ -116,9 +111,19 @@ default settings. You can customize them as you like.
 config.filtered_controllers = /(user|admin|session|registration)/i
 ```
 
-## Extend SimpleActivity - Reuse activity in third party libs
+## Extend
+
+Reuse activity in third party libs.
 
 Docs and demo coming soon.
+
+## Compatability
+
+SimpleActivity is built to work under both Rails 3 and Rails 4. The demo is on Rails 4.
+The current tests are based on Rails 3, and Rails 4 ones will come later.
+
+The current ORM is ActiveRecord. Other ORMS should be able to added in the future without
+too much sweat(or coffee?)
 
 ## Contributing
 

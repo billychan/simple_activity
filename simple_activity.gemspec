@@ -5,14 +5,15 @@ require "simple_activity/version"
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
-  s.name        = "SimpleActivity"
+  s.name        = "simple_activity"
   s.version     = SimpleActivity::VERSION
   s.authors     = ["Billy Chan"]
   s.email       = "billychanpublic@gmail.com"
+  s.homepage    = "https://github.com/billychan/simple_activity"
   s.summary     = "Record, display and reuse users activities for Rails app"
   s.description = %q{SimpleActivity is a gem to record, display and reuse users activities for Rails app, in a fast, flexible and extendable way.}
   s.licenses    = ['MIT']
-  s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.rdoc"]
+  s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.md"]
   s.test_files = Dir["test/**/*"]
 
   s.add_dependency 'rails', '>= 3.2.0', '< 5.0'
