@@ -9,10 +9,10 @@ several models and hard to eager load. SimpleActivity allows you define cache
 rules beforehand so there is no JOIN on displaying activities. 
 * Flexible. Raw data is here, you are free to do anything you like, display them
 in any fashion.
-* Extendable. Actually activity records are very useful not only for displaying a timeline.
+* Extendable. Actually activity records are useful not only for displaying as timeline.
 There could be lots of other functionality based on activity such as assining reputation
-to models, assign points to users, send notifications etc. It would be redudant if
-every feature build its own logic to record activity which is basically the same.
+to models, assign points to users, send notifications, granting badges etc. It would be
+redudant if every feature build its own logic to record activity which is basically the same.
 
     To solve this problem, SimpleActivity provides a hook for other libs or your app code to work
 on the raw data once activity created, either within the request or at
@@ -54,17 +54,7 @@ By default you don't need to do anything to get activities recorded.
 
 Activity record will be created automaticly at basic RESTful actions :create, :update
 and :destroy, with filtering out some controllers such as "registration", "session",
-"admin" etc.
-
-To customize the actions to record
-  TODO
-
-To filter out more controllers
-  TODO
-
-To disable automatic after_filter and do it by yourself
-  TODO
-
+"admin" etc. You can also customize them. See more at Configurations.
 
 ### Display Activities: Define Rules
 
@@ -108,15 +98,33 @@ As said above, to define a link, you don't need the instance itself. Instead, id
 as well. So, instead of `link_to activity.actor`, it's recommended to use
 `link_to user_path(activity.actor_id)`
 
+## Configurations
+
++To customize the actions to record+
+
+The default actions to record activiies are `:create`, `:update` and `:destroy`.
+Customize them as per your need.
+```ruby
+config.filtered_controllers = /(user|admin|session|registration)/i
+```
+
++To filter out more controllers+ 
+
+You don't need activity to be recorded in every controller. Below is the
+default settings. You can customize them as you like.
+```ruby
+config.filtered_controllers = /(user|admin|session|registration)/i
+```
+
 ## Extend SimpleActivity - Reuse activity in third party libs
 
-Funtionality shipped. Docs coming later.
+Docs and demo coming soon.
 
 ## Contributing
 
 This gem is still at its early stage. Very likely there are bugs and unconsidered 
 situations. Thansk for your patience and trust to use it. Your bug reporting and
-pull requests will be much appreciated.
+pull requests will be appreciated.
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
