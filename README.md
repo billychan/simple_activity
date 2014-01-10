@@ -3,6 +3,10 @@
 SimpleActivity is a gem to record, display and reuse users activities for
 Rails app, in a fast, flexible and extendable way.
 
+## Demo
+
+[Demo site](http://intense-crag-2356.herokuapp.com/) and [source](https://github.com/billychan/simple_activity_demo402)
+
 ## Features
 * **Fast** - SimpleActivity is built with speed in mind. Normally activities involve
 several models and hard to eager load. SimpleActivity allows you define cache
