@@ -19,12 +19,12 @@ module SimpleActivity
   class Callbacks
     @@callbacks = []
 
-    def self.add_callback(name, options={})
+    def self.add(name, options={})
       name = name.to_string unless name.kind_of?(String)
       @@callbacks << {name: name}.merge!(options)
     end
 
-    def self.run_callbacks(activity)
+    def self.run(activity)
       @@callbacks.each do |callback|
         const = Object.const_get callback[:name]
         if callback[:backend]
@@ -35,7 +35,7 @@ module SimpleActivity
       end
     end
 
-    def self.delete_callback(name)
+    def self.delete(name)
       @@callbacks.delete_if do |callback|
         callback[:name] == name
       end

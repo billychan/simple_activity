@@ -48,7 +48,7 @@ describe "Record activity by automatic after_filter", type: :controller do
     end
 
     it "calls the third party #process with valid activity" do
-      SimpleActivity::Callbacks.add_callback('FooLib')
+      SimpleActivity::Callbacks.add('FooLib')
       expect(FooLib).to receive(:process) do |activity|
         expect(activity).to be_persisted
       end
@@ -56,7 +56,7 @@ describe "Record activity by automatic after_filter", type: :controller do
     end
 
     it "add the third party to backend jobs" do
-      SimpleActivity::Callbacks.add_callback('FooLib', backend: true)
+      SimpleActivity::Callbacks.add('FooLib', backend: true)
       job = double('job')
       allow(FooLib).to receive(:delay).and_return(job)
       expect(job).to receive(:process)
@@ -64,7 +64,7 @@ describe "Record activity by automatic after_filter", type: :controller do
     end
 
     after do
-      SimpleActivity::Callbacks.delete_callback('FooLib')
+      SimpleActivity::Callbacks.delete('FooLib')
       hide_const("Foolib")
     end
   end

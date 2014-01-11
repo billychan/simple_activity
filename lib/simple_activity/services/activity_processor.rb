@@ -53,7 +53,7 @@ module SimpleActivity
     def save
       if validate_attrs
         Activity.create(activity_attrs).tap do |activity|
-          Callbacks.run_callbacks(activity)
+          Callbacks.run(activity)
         end
       else
         warning
