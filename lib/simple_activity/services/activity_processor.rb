@@ -111,7 +111,7 @@ module SimpleActivity
     end
 
     def cache_methods
-      @cache_methods ||= Rule.get_rules_set(@target_type)
+      @cache_methods ||= Rule.get_rules(@target_type, '_cache')
     end
 
   end

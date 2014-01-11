@@ -30,5 +30,24 @@ module SimpleActivity
         end
       end
     end
+
+    context "#rules" do
+      let(:rules){ {'create'=>'bar', 'cache'=>'foo'} }
+      let(:activity){Activity.new(target_type: 'Article')}
+
+      before do
+        all_rules = { 'Article' => rules }
+        allow(Rule).to receive(:all_rules).and_return(all_rules)
+      end
+
+      it "gets rules for this target_type" do
+        expect(activity.rules).to eq(rules)
+      end
+
+      it "gets speciic rules" do
+        expect(activity.rules('create')).to eq('bar')
+      end
+    end
+
   end
 end

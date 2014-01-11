@@ -67,6 +67,14 @@ module SimpleActivity
       display
     end
 
+    # Get rules for an activity instance.
+    # This can't replace similar method in Processor
+    #
+    # @param set [String] The specific rule set want to get
+    def rules(set=nil)
+      @rules ||= Rule.get_rules(self.target_type, set)
+    end
+
     private
 
     def self.cache_methods

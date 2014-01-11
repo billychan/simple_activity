@@ -7,12 +7,13 @@ module SimpleActivity
     #
     # @param target [String] model class name as string. e.g. "Article"
     #
-    # @param type [String] the rule type, default as "cache". or
-    #   other types defined by third parties
+    # @param rules_set [String]  the specific set to get. Default nil
+    # - get all rules.
     #
     # @return set of rule when matched. Returns nil when unmatching
-    def self.get_rules_set(target, type='_cache')
-      all_rules.try(:[], target).try(:[], type)
+    def self.get_rules(target_type, rules_set=nil)
+      rules = all_rules.try(:[], target_type)
+      rules_set ? rules.try(:[], rules_set) : rules
     end
 
     private
