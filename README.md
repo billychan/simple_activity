@@ -73,7 +73,15 @@ Article:
   ...
 ```
 
-### Display Activities: By partial
+## Display Activities
+
+### Global Activities
+
+The usage of global activities is to show all activities happened in the application.
+The example is the sidebar widget of the demo.
+
+The model method is `Activity.all` or any scope you like. The model Activity is added
+to application so you can add any custom methods you like.
 
 A helper `render_activity(activity)` is shipped. This helper will render partial
 at default place according to the activity. 
@@ -96,6 +104,18 @@ recommended to use them to reduce db load. `activity.actor.name` is less preferr
 As said above, to define a link, you don't need the instance itself. Instead, id will work
 as well. So, instead of `link_to activity.actor`, it's recommended to use
 `link_to user_path(activity.actor_id)`
+
+### User Specific Activities
+
+User specific activities works like a timeline. 
+
+To allow displaying user specific activities, add the following line to User model:
+
+```ruby
+acts_as_activity_actor
+```
+
+Then you can use `@user.activities` method to show activities whose actor is this user.
 
 ## Configurations
 
